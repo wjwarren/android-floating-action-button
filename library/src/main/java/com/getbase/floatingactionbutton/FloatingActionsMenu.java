@@ -459,10 +459,11 @@ public class FloatingActionsMenu extends ViewGroup {
           button.getTag(R.id.fab_label) != null) continue;
 
       TextView label = new TextView(context);
-      label.setText(button.getTitle());
+      label.setId(R.id.fab_label);
       addView(label);
 
       button.setTag(R.id.fab_label, label);
+      button.setTitle(button.getTitle());
     }
   }
 

@@ -26,13 +26,14 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-public class FloatingActionButton extends ImageButton {
+public class FloatingActionButton extends ImageButton implements View.OnClickListener {
 
   public static final int SIZE_NORMAL = 0;
   public static final int SIZE_MINI = 1;
@@ -208,8 +209,18 @@ public class FloatingActionButton extends ImageButton {
   public void setTitle(String title) {
     mTitle = title;
     TextView label = getLabelView();
+
     if (label != null) {
       label.setText(title);
+      label.setOnClickListener(this);
+    }
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void onClick(View view) {
+    if (view.getId() == R.id.fab_label) {
+      performClick();
     }
   }
 
