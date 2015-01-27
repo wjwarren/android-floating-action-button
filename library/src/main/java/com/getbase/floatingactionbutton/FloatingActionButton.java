@@ -58,6 +58,8 @@ public class FloatingActionButton extends ImageButton implements View.OnClickLis
   private int mDrawableSize;
   boolean mStrokeVisible;
 
+  private View.OnClickListener mClickListener;
+
   public FloatingActionButton(Context context) {
     this(context, null);
   }
@@ -73,6 +75,8 @@ public class FloatingActionButton extends ImageButton implements View.OnClickLis
   }
 
   void init(Context context, AttributeSet attributeSet) {
+    mClickListener = null;
+
     TypedArray attr = context.obtainStyledAttributes(attributeSet, R.styleable.FloatingActionButton, 0, 0);
     mColorNormal = attr.getColor(R.styleable.FloatingActionButton_fab_colorNormal, getColor(android.R.color.holo_blue_dark));
     mColorPressed = attr.getColor(R.styleable.FloatingActionButton_fab_colorPressed, getColor(android.R.color.holo_blue_light));
@@ -437,4 +441,22 @@ public class FloatingActionButton extends ImageButton implements View.OnClickLis
 
     super.setVisibility(visibility);
   }
+
+  /** {@inheritDoc} */
+  @Override
+  public void setOnClickListener(View.OnClickListener listener) {
+    if (listener instanceof FloatingActionsMenu || !(getParent() instanceof FloatingActionsMenu)) {
+      super.setOnClickListener(listener);
+    }
+
+    mClickListener = listener;
+  }
+
+  /**
+   * @return {@link View.OnClickListener} - The delegate click listener.
+   */
+  View.OnClickListener getClickListener() {
+    return mClickListener;
+  }
+
 }

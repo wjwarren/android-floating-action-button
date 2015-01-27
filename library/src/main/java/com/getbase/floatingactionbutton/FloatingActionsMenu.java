@@ -20,7 +20,7 @@ import android.view.animation.Interpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
 
-public class FloatingActionsMenu extends ViewGroup {
+public class FloatingActionsMenu extends ViewGroup implements View.OnClickListener {
   public static final int EXPAND_UP = 0;
   public static final int EXPAND_DOWN = 1;
   public static final int EXPAND_LEFT = 2;
@@ -36,6 +36,7 @@ public class FloatingActionsMenu extends ViewGroup {
   private int mAddButtonSize;
   private boolean mAddButtonStrokeVisible;
   private int mExpandDirection;
+  private boolean mAutoCollapse;
 
   private int mButtonSpacing;
   private int mLabelsMargin;
@@ -86,6 +87,7 @@ public class FloatingActionsMenu extends ViewGroup {
     mAddButtonStrokeVisible = attr.getBoolean(R.styleable.FloatingActionsMenu_fab_addButtonStrokeVisible, true);
     mExpandDirection = attr.getInt(R.styleable.FloatingActionsMenu_fab_expandDirection, EXPAND_UP);
     mLabelsStyle = attr.getResourceId(R.styleable.FloatingActionsMenu_fab_labelStyle, 0);
+    mAutoCollapse = attr.getBoolean(R.styleable.FloatingActionsMenu_fab_autoCollapse, false);
     attr.recycle();
 
     if (mLabelsStyle != 0 && expandsHorizontally()) {
@@ -163,12 +165,6 @@ public class FloatingActionsMenu extends ViewGroup {
 
     mAddButton.setId(R.id.fab_expand_menu_button);
     mAddButton.setSize(mAddButtonSize);
-    mAddButton.setOnClickListener(new OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        toggle();
-      }
-    });
 
     addView(mAddButton, super.generateDefaultLayoutParams());
   }
@@ -180,6 +176,8 @@ public class FloatingActionsMenu extends ViewGroup {
     if (mLabelsStyle != 0) {
       createLabels();
     }
+
+    setupButtonListeners();
   }
 
   public void removeButton(FloatingActionButton button) {
@@ -190,6 +188,28 @@ public class FloatingActionsMenu extends ViewGroup {
 
   private int getColor(@ColorRes int id) {
     return getResources().getColor(id);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void onClick(View view) {
+    if (view instanceof FloatingActionButton) {
+      FloatingActionButton button = (FloatingActionButton) view;
+
+      View.OnClickListener listener = button.getClickListener();
+      if (listener != null && !this.equals(listener)) {
+        listener.onClick(view);
+      }
+    }
+
+    if (view.equals(mAddButton)) {
+      toggle();
+      return;
+    }
+
+    if (mAutoCollapse) {
+      collapse();
+    }
   }
 
   @Override
@@ -446,6 +466,8 @@ public class FloatingActionsMenu extends ViewGroup {
     if (mLabelsStyle != 0) {
       createLabels();
     }
+
+    setupButtonListeners();
   }
 
   private void createLabels() {
@@ -464,6 +486,23 @@ public class FloatingActionsMenu extends ViewGroup {
 
       button.setTag(R.id.fab_label, label);
       button.setTitle(button.getTitle());
+    }
+  }
+
+  /**
+   * Creates 'onClickListeners' for all buttons in the menu.
+   */
+  private void setupButtonListeners() {
+    for (int i = 0; i < mButtonsCount; i++) {
+      FloatingActionButton button = (FloatingActionButton) getChildAt(i);
+      OnClickListener oldListener = button.getClickListener();
+
+      button.setOnClickListener(this);
+
+      if (oldListener != null) {
+        // Make sure to re-assign any listener that has been set on a button that has been programmatically created.
+        button.setOnClickListener(oldListener);
+      }
     }
   }
 
