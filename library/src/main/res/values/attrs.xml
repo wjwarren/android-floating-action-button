@@ -32,5 +32,6 @@
             <enum name="right" value="3"/>
         </attr>
         <attr name="fab_autoCollapse" format="boolean" />
+        <attr name="fab_modalOverlay" format="reference|integer" />
     </declare-styleable>
 </resources>

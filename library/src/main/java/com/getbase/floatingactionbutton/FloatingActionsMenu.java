@@ -2,6 +2,7 @@ package com.getbase.floatingactionbutton;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -37,6 +38,8 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
   private boolean mAddButtonStrokeVisible;
   private int mExpandDirection;
   private boolean mAutoCollapse;
+  private int mModalOverlayId;
+  private View mModalOverlayView;
 
   private int mButtonSpacing;
   private int mLabelsMargin;
@@ -88,6 +91,8 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
     mExpandDirection = attr.getInt(R.styleable.FloatingActionsMenu_fab_expandDirection, EXPAND_UP);
     mLabelsStyle = attr.getResourceId(R.styleable.FloatingActionsMenu_fab_labelStyle, 0);
     mAutoCollapse = attr.getBoolean(R.styleable.FloatingActionsMenu_fab_autoCollapse, false);
+    mModalOverlayId = attr.getResourceId(R.styleable.FloatingActionsMenu_fab_modalOverlay, 0);
+
     attr.recycle();
 
     if (mLabelsStyle != 0 && expandsHorizontally()) {
@@ -203,6 +208,10 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
     }
 
     if (view.equals(mAddButton)) {
+      if (mModalOverlayId != 0 && getContext() != null) {
+        mModalOverlayView = ((Activity) getContext()).findViewById(mModalOverlayId);
+      }
+
       toggle();
       return;
     }
@@ -506,11 +515,32 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
     }
   }
 
+  /**
+   * Hides the modal overlay, if set.
+   */
+  private void hideOverlay() {
+    // TODO: Animate!
+    if (mModalOverlayView != null) {
+      mModalOverlayView.setVisibility(GONE);
+    }
+  }
+
+  /**
+   * Shows the modal overlay, if set.
+   */
+  private void showOverlay() {
+    // TODO: Animate!
+    if (mModalOverlayView != null) {
+      mModalOverlayView.setVisibility(VISIBLE);
+    }
+  }
+
   public void collapse() {
     if (mExpanded) {
       mExpanded = false;
       mCollapseAnimation.start();
       mExpandAnimation.cancel();
+      hideOverlay();
 
       if (mListener != null) {
         mListener.onMenuCollapsed();
@@ -531,6 +561,7 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
       mExpanded = true;
       mCollapseAnimation.cancel();
       mExpandAnimation.start();
+      showOverlay();
 
       if (mListener != null) {
         mListener.onMenuExpanded();
