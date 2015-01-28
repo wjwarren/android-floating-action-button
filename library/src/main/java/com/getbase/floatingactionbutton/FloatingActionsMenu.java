@@ -589,6 +589,7 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
   private void hideOverlay() {
     if (mModalOverlayView != null) {
       mModalOverlayView.setAlpha(0);
+      mModalOverlayView.setClickable(false);
     }
   }
 
@@ -599,6 +600,8 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
     if (mModalOverlayView != null) {
       mModalOverlayView.setVisibility(VISIBLE);
       mModalOverlayView.setAlpha(1);
+      mModalOverlayView.setClickable(true);
+      mModalOverlayView.setOnClickListener(this);
     }
   }
 
