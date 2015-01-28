@@ -162,7 +162,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/blue_semi_transparent"
-        android:visibility="gone" />
+        android:alpha="0" />
 
     <com.getbase.floatingactionbutton.FloatingActionsMenu
         android:id="@+id/multiple_actions"
