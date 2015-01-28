@@ -35,6 +35,9 @@ public class MainActivity extends Activity {
 
     FloatingActionButton actionC = new FloatingActionButton(getBaseContext());
     actionC.setTitle("Hide/Show Action B");
+    actionC.setColorNormal(getResources().getColor(R.color.inbox_yellow_default));
+    actionC.setColorPressed(getResources().getColor(R.color.inbox_yellow_pressed));
+    actionC.setSize(FloatingActionButton.SIZE_MINI);
     actionC.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {

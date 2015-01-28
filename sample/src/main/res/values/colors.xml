@@ -9,4 +9,13 @@
     <color name="pink_pressed">#ec407a</color>
     <color name="blue_semi_transparent">#805677fc</color>
     <color name="blue_semi_transparent_pressed">#80738ffe</color>
+
+    <color name="inbox_drop_shadow">#acacac</color>
+    <color name="inbox_white_transparent">#ccfafafa</color>
+    <color name="inbox_red_default">#db4437</color>
+    <color name="inbox_red_pressed">#bf392e</color>
+    <color name="inbox_yellow_default">#fec900</color>
+    <color name="inbox_yellow_pressed">#deb000</color>
+    <color name="inbox_blue_default">#516bfc</color>
+    <color name="inbox_blue_pressed">#475fe6</color>
 </resources>
