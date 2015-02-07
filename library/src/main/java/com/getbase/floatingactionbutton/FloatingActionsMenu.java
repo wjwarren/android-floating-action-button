@@ -36,10 +36,12 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
   private static final float EXPANDED_PLUS_ROTATION = 90f + 45f;
 
   private int mAddButtonPlusColor;
-  private int mAddButtonColorNormal;
-  private int mAddButtonColorPressed;
-  private int mAddButtonSize;
-  private boolean mAddButtonStrokeVisible;
+  protected int mAddButtonColorNormal;
+  protected int mAddButtonColorPressed;
+  protected int mAddButtonSize;
+  protected boolean mAddButtonStrokeVisible;
+  protected String mAddButtonTitle;
+
   private int mExpandDirection;
   private boolean mAutoCollapse;
   private int mModalOverlayId;
@@ -51,9 +53,9 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
 
   private boolean mExpanded;
 
-  private AnimatorSet mExpandAnimation = new AnimatorSet().setDuration(ANIMATION_DURATION);
-  private AnimatorSet mCollapseAnimation = new AnimatorSet().setDuration(ANIMATION_DURATION);
-  private AddFloatingActionButton mAddButton;
+  protected AnimatorSet mExpandAnimation = new AnimatorSet().setDuration(ANIMATION_DURATION);
+  protected AnimatorSet mCollapseAnimation = new AnimatorSet().setDuration(ANIMATION_DURATION);
+  protected AddFloatingActionButton mAddButton;
   private RotatingDrawable mRotatingDrawable;
   private int mMaxButtonWidth;
   private int mMaxButtonHeight;
@@ -65,7 +67,7 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
 
   public interface OnFloatingActionsMenuUpdateListener {
     void onMenuExpanded();
-    void onMenuCollapsed();
+    void onMenuCollapsed(boolean fromAddButton);
   }
 
   public FloatingActionsMenu(Context context) {
@@ -82,7 +84,7 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
     init(context, attrs);
   }
 
-  private void init(Context context, AttributeSet attributeSet) {
+  protected void init(Context context, AttributeSet attributeSet) {
     mButtonSpacing = (int) (getResources().getDimension(R.dimen.fab_actions_spacing) - getResources().getDimension(R.dimen.fab_shadow_radius) - getResources().getDimension(R.dimen.fab_shadow_offset));
     mLabelsMargin = getResources().getDimensionPixelSize(R.dimen.fab_labels_margin);
     mLabelsVerticalOffset = getResources().getDimensionPixelSize(R.dimen.fab_shadow_offset);
@@ -93,6 +95,8 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
     mAddButtonColorPressed = attr.getColor(R.styleable.FloatingActionsMenu_fab_addButtonColorPressed, getColor(android.R.color.holo_blue_light));
     mAddButtonSize = attr.getInt(R.styleable.FloatingActionsMenu_fab_addButtonSize, FloatingActionButton.SIZE_NORMAL);
     mAddButtonStrokeVisible = attr.getBoolean(R.styleable.FloatingActionsMenu_fab_addButtonStrokeVisible, true);
+    mAddButtonTitle = attr.getString(R.styleable.FloatingActionsMenu_fab_addButtonTitle);
+
     mExpandDirection = attr.getInt(R.styleable.FloatingActionsMenu_fab_expandDirection, EXPAND_UP);
     mLabelsStyle = attr.getResourceId(R.styleable.FloatingActionsMenu_fab_labelStyle, 0);
     mLabelsPosition = attr.getInt(R.styleable.FloatingActionsMenu_fab_labelsPosition, LABELS_ON_LEFT_SIDE);
@@ -142,8 +146,8 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
     }
   }
 
-  private void createAddButton(Context context) {
-    mAddButton = new AddFloatingActionButton(context) {
+  protected AddFloatingActionButton constructAddButton(Context context) {
+    return new AddFloatingActionButton(context) {
       @Override
       void updateBackground() {
         mPlusColor = mAddButtonPlusColor;
@@ -172,9 +176,17 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
         return rotatingDrawable;
       }
     };
+  }
+
+  protected void createAddButton(Context context) {
+    mAddButton = constructAddButton(context);
 
     mAddButton.setId(R.id.fab_expand_menu_button);
     mAddButton.setSize(mAddButtonSize);
+
+    if (!"".equals(mAddButtonTitle)) {
+      mAddButton.setTitle(mAddButtonTitle);
+    }
 
     addView(mAddButton, super.generateDefaultLayoutParams());
   }
@@ -228,7 +240,7 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
     }
 
     if (mAutoCollapse) {
-      collapse();
+      collapse(false);
     }
   }
 
@@ -317,29 +329,30 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
           ? buttonsHorizontalCenter - labelsOffset
           : buttonsHorizontalCenter + labelsOffset;
 
-      int nextY = expandUp ?
-          addButtonY - mButtonSpacing :
-          addButtonY + mAddButton.getMeasuredHeight() + mButtonSpacing;
+      int nextY = addButtonY + mAddButton.getMeasuredHeight() + mButtonSpacing;
 
       for (int i = mButtonsCount - 1; i >= 0; i--) {
         final View child = getChildAt(i);
 
-        if (child == mAddButton || child.getVisibility() == GONE) continue;
+        if (child.getVisibility() == GONE) continue;
 
         int childX = buttonsHorizontalCenter - child.getMeasuredWidth() / 2;
         int childY = expandUp ? nextY - child.getMeasuredHeight() : nextY;
-        child.layout(childX, childY, childX + child.getMeasuredWidth(), childY + child.getMeasuredHeight());
 
         float collapsedTranslation = addButtonY - childY;
         float expandedTranslation = 0f;
 
-        child.setTranslationY(mExpanded ? expandedTranslation : collapsedTranslation);
-        child.setAlpha(mExpanded ? 1f : 0f);
+        if (child != mAddButton) {
+          child.layout(childX, childY, childX + child.getMeasuredWidth(), childY + child.getMeasuredHeight());
 
-        LayoutParams params = (LayoutParams) child.getLayoutParams();
-        params.mCollapseDir.setFloatValues(expandedTranslation, collapsedTranslation);
-        params.mExpandDir.setFloatValues(collapsedTranslation, expandedTranslation);
-        params.setAnimationsTarget(child);
+          child.setTranslationY(mExpanded ? expandedTranslation : collapsedTranslation);
+          child.setAlpha(mExpanded ? 1f : 0f);
+
+          LayoutParams params = (LayoutParams) child.getLayoutParams();
+          params.mCollapseDir.setFloatValues(expandedTranslation, collapsedTranslation);
+          params.mExpandDir.setFloatValues(collapsedTranslation, expandedTranslation);
+          params.setAnimationsTarget(child);
+        }
 
         View label = (View) child.getTag(R.id.fab_label);
         if (label != null) {
@@ -356,6 +369,9 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
               : labelXAwayFromButton;
 
           int labelTop = childY - mLabelsVerticalOffset + (child.getMeasuredHeight() - label.getMeasuredHeight()) / 2;
+            if (child == mAddButton) {
+                collapsedTranslation = expandedTranslation;
+            }
 
           label.layout(labelLeft, labelTop, labelRight, labelTop + label.getMeasuredHeight());
 
@@ -368,9 +384,7 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
           labelParams.setAnimationsTarget(label);
         }
 
-        nextY = expandUp ?
-            childY - mButtonSpacing :
-            childY + child.getMeasuredHeight() + mButtonSpacing;
+        nextY = expandUp ? childY - mButtonSpacing : childY + child.getMeasuredHeight() + mButtonSpacing;
       }
       break;
 
@@ -575,8 +589,7 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
       FloatingActionButton button = (FloatingActionButton) getChildAt(i);
       String title = button.getTitle();
 
-      if (button == mAddButton || title == null ||
-          button.getTag(R.id.fab_label) != null) continue;
+      if (title == null || button.getTag(R.id.fab_label) != null) continue;
 
       TextView label = new TextView(context);
       label.setId(R.id.fab_label);
@@ -626,21 +639,21 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
     }
   }
 
-  public void collapse() {
+  public void collapse(boolean fromAddButton) {
     if (mExpanded) {
       mExpanded = false;
       mCollapseAnimation.start();
       mExpandAnimation.cancel();
 
       if (mListener != null) {
-        mListener.onMenuCollapsed();
+        mListener.onMenuCollapsed(fromAddButton);
       }
     }
   }
 
   public void toggle() {
     if (mExpanded) {
-      collapse();
+      collapse(true);
     } else {
       expand();
     }

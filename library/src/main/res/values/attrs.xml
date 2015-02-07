@@ -24,6 +24,7 @@
         </attr>
         <attr name="fab_addButtonPlusIconColor" format="color"/>
         <attr name="fab_addButtonStrokeVisible" format="boolean"/>
+        <attr name="fab_addButtonTitle" format="string"/>
         <attr name="fab_labelStyle" format="reference"/>
         <attr name="fab_labelsPosition" format="enum">
             <enum name="left" value="0"/>
@@ -37,5 +38,9 @@
         </attr>
         <attr name="fab_autoCollapse" format="boolean" />
         <attr name="fab_modalOverlay" format="reference|integer" />
+    </declare-styleable>
+    <declare-styleable name="ChangingIconFloatingActionsMenu">
+        <attr name="fab_collapsedIcon" format="reference"/>
+        <attr name="fab_expandedIcon" format="reference"/>
     </declare-styleable>
 </resources>

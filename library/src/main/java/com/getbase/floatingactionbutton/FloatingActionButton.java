@@ -48,7 +48,7 @@ public class FloatingActionButton extends ImageButton implements View.OnClickLis
   int mColorDisabled;
   String mTitle;
   @DrawableRes
-  private int mIcon;
+  protected int mIcon;
   private Drawable mIconDrawable;
   private int mSize;
 

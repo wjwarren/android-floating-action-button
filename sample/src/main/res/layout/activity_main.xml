@@ -182,7 +182,7 @@
         android:background="@color/inbox_white_transparent"
         android:alpha="0" />
 
-    <com.getbase.floatingactionbutton.FloatingActionsMenu
+    <com.getbase.floatingactionbutton.ChangingIconFloatingActionsMenu
         android:id="@+id/multiple_actions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -192,6 +192,9 @@
         fab:fab_addButtonColorNormal="@color/inbox_red_default"
         fab:fab_addButtonColorPressed="@color/inbox_red_pressed"
         fab:fab_addButtonPlusIconColor="@color/white"
+        fab:fab_collapsedIcon="@drawable/ic_edit"
+        fab:fab_expandedIcon="@drawable/ic_fab_star"
+        fab:fab_addButtonTitle="Add button action"
         fab:fab_labelStyle="@style/inbox_labels_style"
         fab:fab_autoCollapse="true"
         fab:fab_modalOverlay="@+id/rl_modal_overlay"
@@ -217,5 +220,5 @@
             fab:fab_colorNormal="@color/inbox_blue_default"
             fab:fab_colorPressed="@color/inbox_blue_pressed" />
 
-    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+    </com.getbase.floatingactionbutton.ChangingIconFloatingActionsMenu>
 </RelativeLayout>
