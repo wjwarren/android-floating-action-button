@@ -53,8 +53,13 @@ public class ChangingIconFloatingActionButton extends AddFloatingActionButton {
     }
 
     public void setDrawableResources(int collapsedResourceId, int expandedResourceId) {
-        mCollapsedDrawable = getResources().getDrawable(collapsedResourceId);
-        mExpandedDrawable = getResources().getDrawable(expandedResourceId);
+        Drawable collapsed = getResources().getDrawable(collapsedResourceId);
+        mCollapsedDrawable = collapsed.getConstantState().newDrawable(getResources());
+        mCollapsedDrawable.mutate();
+
+        Drawable expanded = getResources().getDrawable(expandedResourceId);
+        mExpandedDrawable = expanded.getConstantState().newDrawable(getResources());
+        mExpandedDrawable.mutate();
         mExpandedDrawable.setAlpha(0);
 
         mIconDrawable = new LayerDrawable(new Drawable[] {mCollapsedDrawable, mExpandedDrawable});
