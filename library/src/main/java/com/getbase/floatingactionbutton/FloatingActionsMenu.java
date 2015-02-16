@@ -592,6 +592,7 @@ public class FloatingActionsMenu extends ViewGroup implements View.OnClickListen
       if (title == null || button.getTag(R.id.fab_label) != null) continue;
 
       TextView label = new TextView(context);
+      label.setTextAppearance(getContext(), mLabelsStyle);
       label.setId(R.id.fab_label);
       addView(label);
 
